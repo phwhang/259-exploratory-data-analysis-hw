@@ -215,29 +215,30 @@ for (month in names(months)) {
 library(DataExplorer)
 
 glimpse(ds)
-
-# boxplots
-ds %>% 
-  select(-station, -month) %>% 
-  plot_boxplot(., by = 'city')
-ds %>% 
-  select(-station, -city) %>% 
-  plot_boxplot(., by = 'month')
-
-# corrs
-
+?plot_boxplot
 ?plot_correlation
 
-ds %>% 
-  select(-station, -city, -month) %>% 
-  plot_correlation(., type = 'continuous')
+# boxplots
+plot_boxplot(ds, by = 'city')
+plot_boxplot(ds, by = 'month')
+
+# corrs
+plot_correlation(ds, type = 'continuous')
 
 # QUESTION 9
 #> Create a scatterplot of actual_mean_temp (y axis) by date (x axis)
 #> Use facet_wrap to make a separate plot for each city (3 columns)
 #> Make the points different colors according to month
 
+?facet_wrap
 
+# generate plot
+ggplot(ds, aes(x = date,
+               y = actual_mean_temp,
+               color = month)) +
+  geom_point() +
+  facet_wrap(facets = vars(city),
+             ncol = 3)
 
 # QUESTION 10
 #> Write a function that takes the dataset and the abbreviate month as arguments
@@ -248,4 +249,26 @@ ds %>%
 #> The eda folder has an example of what each plot should look like
 #> Call the function in a map or loop to generate graphs for each month
 
+# still doing actual mean temp here?
 
+?ggtitle
+
+plot_by_month <- function(data, month) {
+  plot <- ggplot(data, aes(y = actual_mean_temp,
+                           x = date,
+                           color = city)) +
+    geom_point() +
+    geom_line() +
+    labs(title = month)
+
+  ggsave(paste0('eda/', month, '.png'))
+}
+
+# call function
+for (month in names(months)) {
+  month_data <- months[[month]]
+  
+  plot_by_month(month_data, month)
+}
+
+# end of code! that was fun.
